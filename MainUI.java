@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainUI extends JFrame {
-    private user currentUser; // uses the provided `user` class
+    private user currentUser; 
 
     private JTextField nameField;
     private JComboBox<String> moodCombo;
@@ -18,7 +18,7 @@ public class MainUI extends JFrame {
     private JLabel quoteLabel;
     private JPanel centerPanel;
 
-    // built-in quotes fallback
+    
     private static final String[] DEFAULT_QUOTES = {
         "This too shall pass.",
         "Small steps every day.",
@@ -35,10 +35,10 @@ public class MainUI extends JFrame {
 
         getContentPane().setLayout(new BorderLayout(12, 12));
 
-        // Top: header / user registration
+        
         getContentPane().add(createTopPanel(), BorderLayout.NORTH);
 
-        // Center: main interactive area
+        
         centerPanel = new JPanel(new BorderLayout(10,10));
         centerPanel.setBorder(new EmptyBorder(10,10,10,10));
         centerPanel.add(createMoodPanel(), BorderLayout.WEST);
@@ -47,7 +47,7 @@ public class MainUI extends JFrame {
 
         getContentPane().add(centerPanel, BorderLayout.CENTER);
 
-        // Footer: status
+        
         JLabel footer = new JLabel("Built with Java Swing — integrates with user, mood tracker and optional providers if present.");
         footer.setBorder(new EmptyBorder(6,10,6,10));
         getContentPane().add(footer, BorderLayout.SOUTH);
@@ -170,7 +170,7 @@ public class MainUI extends JFrame {
         return p;
     }
 
-    // --- Actions ---
+    
     private void onCreateUser(){
         String name = nameField.getText().trim();
         if(name.isEmpty()){
@@ -179,7 +179,7 @@ public class MainUI extends JFrame {
         }
 
         try{
-            // Try to instantiate provided `user` class via constructor that accepts String
+            
             Class<?> userClass = Class.forName("user");
             Constructor<?> ctor = userClass.getConstructor(String.class);
             Object u = ctor.newInstance(name);
@@ -187,9 +187,9 @@ public class MainUI extends JFrame {
             refreshHistory();
             JOptionPane.showMessageDialog(this, "User created/loaded: " + currentUser.getName());
         } catch (ClassNotFoundException cnf){
-            // fallback: create a local simple user-like wrapper
+            
             JOptionPane.showMessageDialog(this, "Provided 'user' class not found on classpath. Using local fallback.\nMake sure your user.java is compiled and in same folder.", "Warning", JOptionPane.WARNING_MESSAGE);
-            this.currentUser = new user(name); // still works if the provided class exists; otherwise your local user file will be used
+            this.currentUser = new user(name);
             refreshHistory();
         } catch (Exception ex){
             ex.printStackTrace();
@@ -218,16 +218,16 @@ public class MainUI extends JFrame {
     }
 
     private void onStartCalmActivity(){
-        // Try to call external CalmActivity class if present via reflection
+       
         try{
             Class<?> calm = Class.forName("CalmActivity");
-            // try static method 'start' or 'showActivity'
+            
             try{
                 Method m = calm.getMethod("start");
                 m.invoke(null);
                 return;
             } catch (NoSuchMethodException ns){
-                // try constructor and instance method 'start' or 'show'
+                
                 try{
                     Object inst = calm.getDeclaredConstructor().newInstance();
                     try{
@@ -240,20 +240,20 @@ public class MainUI extends JFrame {
                             m3.invoke(inst);
                             return;
                         } catch (NoSuchMethodException ns3){
-                            // fall through to fallback
+                           
                         }
                     }
                 } catch(Exception e){
-                    // fall through to fallback
+                    
                 }
             }
         } catch (ClassNotFoundException cnf){
-            // not present — show fallback
+            
         } catch (Exception ex){
             ex.printStackTrace();
         }
 
-        // fallback: open internal breathing activity
+        
         showBreathingDialog();
     }
 
@@ -290,7 +290,7 @@ public class MainUI extends JFrame {
         d.add(animPanel, BorderLayout.CENTER);
         d.add(close, BorderLayout.SOUTH);
 
-        // simple animation using Timer
+        
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask(){
             int step = 0;
@@ -298,7 +298,7 @@ public class MainUI extends JFrame {
             public void run(){
                 SwingUtilities.invokeLater(() -> {
                     Math.sin(step * Math.PI / 20);
-                    // reflect radius into animPanel
+                    
                     animPanel.setPreferredSize(new Dimension(animPanel.getWidth(), animPanel.getHeight()));
                     animPanel.repaint();
                     step = (step+1) % 40;
@@ -356,7 +356,7 @@ public class MainUI extends JFrame {
        
         try{
             Class<?> qp = Class.forName("quoteprovider");
-            // try static method getQuote()
+            
             try{
                 Method m = qp.getMethod("getQuote");
                 Object q = m.invoke(null);
@@ -369,15 +369,15 @@ public class MainUI extends JFrame {
                     Object q2 = m2.invoke(inst);
                     if(q2!=null) return q2.toString();
                 } catch(Exception ex){
-                    // ignore
+                   
                 }
             }
         } catch (ClassNotFoundException cnf){
-            // ignore — use default
+            
         } catch (Exception ex){
             ex.printStackTrace();
         }
-        // fallback
+        
         int i = (int)(Math.random() * DEFAULT_QUOTES.length);
         return DEFAULT_QUOTES[i];
     }
